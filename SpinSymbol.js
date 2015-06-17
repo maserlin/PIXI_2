@@ -1,5 +1,6 @@
 function SpinSymbol(id){
-
+    this.blur = false;
+    
     var iconTextures = [];
 
     for(var i=0; i<12; ++i)
@@ -28,12 +29,17 @@ function SpinSymbol(id){
 
 SpinSymbol.prototype = Object.create(PIXI.extras.MovieClip.prototype);
 SpinSymbol.prototype.constructor = SpinSymbol;
+SpinSymbol.prototype.blur = false;
 
-SpinSymbol.prototype.setId = function(id){
+SpinSymbol.prototype.setId = function(id, blur){
+    blur = blur || false;
     
-    if(this.id != id)
+    if(this.id != id || this.blur != blur)
     {
+        this.blur = blur;
         this.id = id;
-        this.gotoAndStop(this.id);
+        if(this.blur)this.gotoAndStop(this.id+this.blurOffset);
+        else this.gotoAndStop(this.id);
     }
 }
+

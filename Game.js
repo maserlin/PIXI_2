@@ -6,7 +6,9 @@ function Game(){
   this.reelset = null;
 }
   
-
+/**
+ * TODO proper config  
+ */
 var reels_0 = [ [0,1,2,3,5,4,6,5,4,7,8,7,8,9,8,7,3,2,4,5,4,3,4,5,6,7,6,5,4,5],
                 [0,1,2,3,5,4,6,5,4,7,8,7,8,9,8,7,3,2,4,5,4,3,4,5,6,7,6,5,4,5],
                 [0,1,2,3,5,4,6,5,4,7,8,7,8,9,8,7,3,2,4,5,4,3,4,5,6,7,6,5,4,5],
@@ -16,16 +18,30 @@ var reels_0 = [ [0,1,2,3,5,4,6,5,4,7,8,7,8,9,8,7,3,2,4,5,4,3,4,5,6,7,6,5,4,5],
 
 Game.prototype.onAssetsLoaded = function(obj){
     
-    // create a background
-    this.bg = new GameBackground("im/bg.jpg");
-
     // Shuffle fake reels    
     for(var i=0;i<reels_0.length;++i){
         reels_0[i] = shuffleArray(reels_0[i]);
     }
+
+
+    /*
+     * Create a background which shoudl be in a lower layer
+     */
+    this.bg = new GameBackground("im/bg.jpg");
     
+    /*
+     * This should be a gameScreen which has a reelset OR
+     * build a reelset which can be passed to main game screen and 
+     * freespins game screen.
+     * It should be in a mid-level container layered up with 
+     * winlines and win presentation layers (containers) so that 
+     * everything resizes and scales together in proportion. 
+     */
     this.reelset = new Reelset(reels_0);
     
+    /*
+     * This should be a whole console component in an upper layer. 
+     */
     this.spinButton = new SpinButton("Icon05_");
 
         
@@ -40,7 +56,7 @@ Game.prototype.onAssetsLoaded = function(obj){
 Game.prototype.onSpinReels = function(){
     console.log("call spin");
     
-    this.reelset.spinReels([0,250,500,750,1000]);
+    this.reelset.spinReels([0,200,400,600,800]);
     
 }
 Game.prototype.onStopReels = function(){

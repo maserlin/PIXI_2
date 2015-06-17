@@ -7,7 +7,13 @@ function Reel(reel, reelband){
     this.index = 0;
     this.id = reel;
     this.cueStop = false;
-    this.speed = (140/5*2)/(1000/30);
+    
+    this.liftSpeed = 4;
+    this.bounceSpeed = 4;
+    this.bounceDistance = 0.3;
+    this.speed = 60;
+    this.blur = false;
+    
     this.setSymbols = 0;
 
     console.log("Created Reel id " + this.id + " symbols " + this.reelband);
@@ -29,24 +35,6 @@ function Reel(reel, reelband){
     }
     this.frameTop = this.symbols[1].position.y;
     
-    /*
-     * TODO Run ticker externally to theis class, probably in Game.
-     * Probably make a whole game animation loop thing?
-     */
-    this.ticker = PIXI.ticker.shared;
-    // Set this to prevent starting this ticker when listeners are added.
-    // By default this is true only for the PIXI.ticker.shared instance.
-    this.ticker.autoStart = false;
-    // FYI, call this to ensure the ticker is stopped. It should be stopped
-    // if you have not attempted to render anything yet.
-    this.ticker.stop();
-    // Call this when you are ready for a running shared ticker.
-    // this.ticker.start();
-        //stage.addChild(this.container);
-        var that = this;
-            this.ticker.add(function (time) {
-                that.animate(time);
-    });
 }
 
 Reel.prototype = Object.create(PIXI.Container.prototype);
@@ -57,6 +45,7 @@ Reel.STARTING = 1;
 Reel.SPINNING = 2;
 Reel.SETTING = 3;
 Reel.STOPPING = 4;
+Reel.BOUNCING = 5;
 Reel.prototype.state = Reel.IDLE;
 
 /**
@@ -65,9 +54,10 @@ Reel.prototype.state = Reel.IDLE;
 Reel.prototype.spin = function(){
     console.log("Reel " + this.id + " spin.")
     this.cueStop = false;
+    this.blur = false;
     if(this.state == Reel.IDLE){
         console.log("STARTING");
-        this.ticker.start();
+        this.setSymbols = 0;
         this.state = Reel.STARTING;
     }
 }
@@ -116,8 +106,33 @@ Reel.prototype.animate = function(time){
         case Reel.STOPPING:
             this.stopReel();
             break;    
+
+        case Reel.BOUNCING:
+            this.bounceReel();
+            break;    
     }
 }
+
+
+/**
+ * Animation loop: set the new symbols to come in  
+ */
+Reel.prototype.bounceReel = function(){
+    for(var s in this.symbols){
+        this.symbols[s].position.y -= this.bounceSpeed;
+    }
+    
+    if(this.symbols[0].position.y <=0){
+        for(var s in this.symbols){
+            this.symbols[s].position.y = s * 140;
+        }
+        this.state = Reel.IDLE;
+        console.log("IDLE " + this.symbolsInView())
+        Events.Dispatcher.dispatchEvent(new Event("REEL_STOPPED", this.id));
+    }
+}
+
+
 
 /**
  * Animation loop: set the new symbols to come in  
@@ -136,36 +151,36 @@ Reel.prototype.setReel = function(){
         
         for(var s in this.symbols){
             this.symbols[s].position.y -= offset;
-            this.symbols[s].setId(ids[s]);
+            this.symbols[s].setId(ids[s],this.blur);
         }
         
         // -- new symbols
         ++this.setSymbols;
         switch(this.setSymbols){
             case 1:
-            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos+2)]);
+            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos-2)],this.blur);
             break;
             case 2:
-            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos+1)]);
-            this.symbols[1].setId(this.newReelband[this.getWrappedIndex(this.stopPos+2)]);
+            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos-1)],this.blur);
+            this.symbols[1].setId(this.newReelband[this.getWrappedIndex(this.stopPos-2)],this.blur);
             break;
             case 3:
-            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos)]);
-            this.symbols[1].setId(this.newReelband[this.getWrappedIndex(this.stopPos+1)]);
-            this.symbols[2].setId(this.newReelband[this.getWrappedIndex(this.stopPos+2)]);
+            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos)],this.blur);
+            this.symbols[1].setId(this.newReelband[this.getWrappedIndex(this.stopPos-1)],this.blur);
+            this.symbols[2].setId(this.newReelband[this.getWrappedIndex(this.stopPos-2)],this.blur);
             break;
             case 4:
-            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos-1)]);
-            this.symbols[1].setId(this.newReelband[this.getWrappedIndex(this.stopPos)]);
-            this.symbols[2].setId(this.newReelband[this.getWrappedIndex(this.stopPos+1)]);
-            this.symbols[3].setId(this.newReelband[this.getWrappedIndex(this.stopPos+2)]);
+            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos+1)],this.blur);
+            this.symbols[1].setId(this.newReelband[this.getWrappedIndex(this.stopPos)],this.blur);
+            this.symbols[2].setId(this.newReelband[this.getWrappedIndex(this.stopPos-1)],this.blur);
+            this.symbols[3].setId(this.newReelband[this.getWrappedIndex(this.stopPos-2)],this.blur);
             break;
             case 5:
-            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos-2)]);
-            this.symbols[1].setId(this.newReelband[this.getWrappedIndex(this.stopPos-1)]);
-            this.symbols[2].setId(this.newReelband[this.getWrappedIndex(this.stopPos)]);
-            this.symbols[3].setId(this.newReelband[this.getWrappedIndex(this.stopPos+1)]);
-            this.symbols[4].setId(this.newReelband[this.getWrappedIndex(this.stopPos+2)]);
+            this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos+2)],this.blur);
+            this.symbols[1].setId(this.newReelband[this.getWrappedIndex(this.stopPos+1)],this.blur);
+            this.symbols[2].setId(this.newReelband[this.getWrappedIndex(this.stopPos)],this.blur);
+            this.symbols[3].setId(this.newReelband[this.getWrappedIndex(this.stopPos-1)],this.blur);
+            this.symbols[4].setId(this.newReelband[this.getWrappedIndex(this.stopPos-2)],this.blur);
             this.state = Reel.STOPPING;
             break;
         }
@@ -180,19 +195,19 @@ Reel.prototype.stopReel = function(){
         this.symbols[s].position.y += this.speed;
     }
 
-    if(this.symbols[0].position.y >= this.frameTop){
+    if(this.symbols[0].position.y >= this.frameTop * this.bounceDistance){
 
+        if(this.blur)this.blur = false;
         var offset = this.symbols[0].position.y;
-        this.index = this.getWrappedIndex(this.index+1);
+        this.index = this.getWrappedIndex(this.stopPos);
         this.reelband = this.newReelband;
         var ids = this.symbolsOnReel();
         for(var s in this.symbols){
-            this.symbols[s].position.y -= offset;
-            this.symbols[s].setId(ids[s]);
+            this.symbols[s].setId(ids[s],this.blur);
         }
 
-        this.state = Reel.IDLE;
-        if(this.id == 4)this.ticker.stop();
+        this.state = Reel.BOUNCING;
+        console.log("STOP " + this.symbolsInView())
     }
     
 }
@@ -212,8 +227,9 @@ Reel.prototype.spinReel = function(){
         var ids = this.symbolsOnReel();
         for(var s in this.symbols){
             this.symbols[s].position.y -= offset;
-            this.symbols[s].setId(ids[s]);
+            this.symbols[s].setId(ids[s],this.blur);
         }
+        if(!this.blur)this.blur = true;
     }
 }
 
@@ -223,7 +239,7 @@ Reel.prototype.spinReel = function(){
  */
 Reel.prototype.lift = function(){
     for(var s in this.symbols){
-        --this.symbols[s].position.y;
+        this.symbols[s].position.y -= this.liftSpeed;
     }
     if(this.symbols[1].position.y < this.frameTop/3*2){
         this.state = Reel.SPINNING;

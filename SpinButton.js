@@ -25,11 +25,19 @@ function SpinButton(imageName){
         that.performStateAction();
     }
     stage.addChild(this.spinButton);
+
+    this.onAllReelsStopped = this.onAllReelsStopped.bind(this);
+    Events.Dispatcher.addEventListener("ALL_REELS_STOPPED",this.onAllReelsStopped);
 };
 
     SpinButton.IDLE = 0;
     SpinButton.SPIN = 1;
     SpinButton.STOP = 2;
+
+
+SpinButton.prototype.onAllReelsStopped = function(event){
+    this.state = SpinButton.IDLE;
+}
 
 /**
  * Perform action and move to next state
@@ -45,14 +53,11 @@ SpinButton.prototype.performStateAction = function(state){
                 Events.Dispatcher.dispatchEvent(new Event("SPIN"));
                 break;
             case SpinButton.SPIN:
-                this.state = SpinButton.IDLE;
+                this.state = SpinButton.STOP;
                 // Listened to by Game to provide timings and stopPositions
                 Events.Dispatcher.dispatchEvent(new Event("STOP"));
                 break;
             case SpinButton.STOP:
-                this.state = SpinButton.IDLE;
-                // Listened to by Game to provide timings and stopPositions
-                Events.Dispatcher.dispatchEvent(new Event("STOP"));
                 break;
         }
     }
