@@ -18,25 +18,55 @@ function SpinButton(imageName){
     this.spinButton.interactive = true;
     
     // Fix scope
+    this.clicked = false;
+    this.buttonClick = this.buttonClick.bind(this);
+    
     var that = this;
     this.spinButton.click = function(data){
-        //"this" is the icon
-        this.gotoAndPlay(0);
-        that.performStateAction();
+        that.buttonClick();
     }
+    this.spinButton.tap = function(data){
+        that.buttonClick();
+    }
+
     stage.addChild(this.spinButton);
 
     this.onAllReelsStopped = this.onAllReelsStopped.bind(this);
     Events.Dispatcher.addEventListener("ALL_REELS_STOPPED",this.onAllReelsStopped);
+    this.onAllReelsSpinning = this.onAllReelsSpinning.bind(this);
+    Events.Dispatcher.addEventListener("ALL_REELS_SPINNING",this.onAllReelsSpinning);
 };
 
     SpinButton.IDLE = 0;
     SpinButton.SPIN = 1;
     SpinButton.STOP = 2;
 
+/**
+ * Try to deal with some Droid double-tap issue
+ */
+SpinButton.prototype.onAllReelsSpinning = function(){
+    this.clicked = false;
+}
+
+/**
+ * Clicks may fire twice on certain android devices
+ * but only once on iPad or desktop or other Androids. 
+ */
+SpinButton.prototype.buttonClick = function(){
+    if(!this.clicked){
+        this.spinButton.gotoAndPlay(0);
+        this.clicked = true;
+        this.performStateAction();
+    }
+    else{
+        this.clicked = false;
+    }
+}
+
 
 SpinButton.prototype.onAllReelsStopped = function(event){
     this.state = SpinButton.IDLE;
+    this.clicked = false;
 }
 
 /**

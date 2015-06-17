@@ -49,6 +49,8 @@ function Reelset(reels){
     this.stopReels = this.stopReels.bind(this);
     this.onReelStopped = this.onReelStopped.bind(this);
     Events.Dispatcher.addEventListener("REEL_STOPPED",this.onReelStopped);
+    this.onReelSpinning = this.onReelSpinning.bind(this);
+    Events.Dispatcher.addEventListener("REEL_SPINNING",this.onReelSpinning);
     
     // Reel animation loop
     this.ticker = PIXI.ticker.shared;
@@ -66,6 +68,13 @@ function Reelset(reels){
     });
 }
 
+
+Reelset.prototype.onReelSpinning = function(event){
+    if(event.data == 4)
+    {
+        Events.Dispatcher.dispatchEvent(new Event("ALL_REELS_SPINNING"));
+    }
+}
 
 Reelset.prototype.onReelStopped = function(event){
     if(event.data == 4)

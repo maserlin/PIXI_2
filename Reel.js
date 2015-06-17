@@ -243,6 +243,7 @@ Reel.prototype.lift = function(){
     }
     if(this.symbols[1].position.y < this.frameTop/3*2){
         this.state = Reel.SPINNING;
+        Events.Dispatcher.dispatchEvent(new Event("REEL_SPINNING",this.id));
     }
 }
 
