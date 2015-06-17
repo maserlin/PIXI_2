@@ -1,6 +1,5 @@
 function Reelset(reels){
     this.container = new PIXI.Container();
-    //this.reelcontainer = new PIXI.Container();
     
     // Reel Background    
     var reelBg = new PIXI.Sprite(PIXI.Texture.fromImage("im/reelbg.png"));
@@ -27,8 +26,8 @@ function Reelset(reels){
     // Masking
     var thing = new PIXI.Graphics();
     thing.beginFill(0x000000,0.0);
-    var start = new Point(18,168);
-    var height = 430;
+    var start = new Point(18,170);
+    var height = 426;
     var width = 826;
     thing.drawRect(start.x,start.y,width,height);
     
@@ -43,11 +42,12 @@ function Reelset(reels){
     reelFg.position.y = 164;
     this.container.addChild(reelFg);
 
-    //this.reelcontainer.addChild(this.container);
     this.container.resize = this.resize;
     stage.addChild(this.container);
+    
+    this.spinReels = this.spinReels.bind(this);
+    this.stopReels = this.stopReels.bind(this);
 }
-
 
 
 Reelset.prototype.spinReels = function(timing){
@@ -57,6 +57,18 @@ Reelset.prototype.spinReels = function(timing){
        setTimeout(function(){
            console.log(next)
            that.reels[next].spin();
+           ++next 
+       },timing[t]);      
+    }
+}
+
+Reelset.prototype.stopReels = function(timing, positions){
+    var that = this;
+    var next = 0;
+    for(var t in timing){
+       setTimeout(function(){
+           console.log(next)
+           that.reels[next].stop(positions[next]);
            ++next 
        },timing[t]);      
     }

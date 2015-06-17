@@ -25,7 +25,10 @@ GameLoader.prototype.onAssetsLoaded = function(data){
     for ( var obj in data.resources){
         console.log("Loaded " + obj);
     }
-    this.callback();
+//    this.callback();
+    
+    Events.Dispatcher.dispatchEvent(new Event("ASSETS_LOADED"));
+    
 }
 
 GameLoader.prototype.callback = function(){

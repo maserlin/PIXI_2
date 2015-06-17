@@ -26,25 +26,35 @@ function SpinButton(imageName){
     }
     stage.addChild(this.spinButton);
 };
+
     SpinButton.IDLE = 0;
     SpinButton.SPIN = 1;
     SpinButton.STOP = 2;
 
 /**
- * 
+ * Perform action and move to next state
  */
-SpinButton.prototype.performStateAction = function(){
-    if(this.actions[this.state])this.actions[this.state]();
-    switch(this.state){
-        case SpinButton.IDLE:
-            this.state = SpinButton.SPIN;
-            break;
-        case SpinButton.SPIN:
-            this.state = SpinButton.IDLE;
-            break;
-        case SpinButton.STOP:
-            this.state = SpinButton.IDLE;
-            break;
+SpinButton.prototype.performStateAction = function(state){
+    
+    if(state != null)this.state = state;
+    else{
+        switch(this.state){
+            case SpinButton.IDLE:
+                this.state = SpinButton.SPIN;
+                // Listened to by Game to provide timings
+                Events.Dispatcher.dispatchEvent(new Event("SPIN"));
+                break;
+            case SpinButton.SPIN:
+                this.state = SpinButton.IDLE;
+                // Listened to by Game to provide timings and stopPositions
+                Events.Dispatcher.dispatchEvent(new Event("STOP"));
+                break;
+            case SpinButton.STOP:
+                this.state = SpinButton.IDLE;
+                // Listened to by Game to provide timings and stopPositions
+                Events.Dispatcher.dispatchEvent(new Event("STOP"));
+                break;
+        }
     }
 }
 
@@ -52,6 +62,3 @@ SpinButton.prototype.setState = function(state){
     this.state = state;
 };
 
-SpinButton.prototype.setAction = function(name,callback){
-    this.actions[name] = callback;
-};

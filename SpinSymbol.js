@@ -1,5 +1,7 @@
 function SpinSymbol(id){
+
     var iconTextures = [];
+
     for(var i=0; i<12; ++i)
     {
         var texture;
@@ -18,9 +20,10 @@ function SpinSymbol(id){
     }
 
     PIXI.extras.MovieClip.call(this, iconTextures);
-//    this.movie = new PIXI.extras.MovieClip(iconTextures);
+
     this.id = id;
     this.gotoAndStop(this.id);
+    console.log("Symbol set to " + this.id);
 }
 
 SpinSymbol.prototype = Object.create(PIXI.extras.MovieClip.prototype);
