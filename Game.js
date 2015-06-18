@@ -1,33 +1,35 @@
 function Game(){
-  this.bg = null;
-  this.bunny = null;
-  this.spinButton = null;
-  this.rect = null;
-  this.reelset = null;
+    this.bg = null;
+    this.bunny = null;
+    this.spinButton = null;
+    this.rect = null;
+    this.reelset = null;
+
+    this.onWinSplashComplete = this.onWinSplashComplete.bind(this);
 }
   
 /**
  * TODO proper config  
  */
-var reels_0 = [ [0,1,2,3,5,4,6,5,4,7,8,7,8,9,8,7,3,2,4,5,4,3,4,5,6,7,6,5,4,5],
-                [0,1,2,3,5,4,6,5,4,7,8,7,8,9,8,7,3,2,4,5,4,3,4,5,6,7,6,5,4,5],
-                [0,1,2,3,5,4,6,5,4,7,8,7,8,9,8,7,3,2,4,5,4,3,4,5,6,7,6,5,4,5],
-                [0,1,2,3,5,4,6,5,4,7,8,7,8,9,8,7,3,2,4,5,4,3,4,5,6,7,6,5,4,5],
-                [0,1,2,3,5,4,6,5,4,7,8,7,8,9,8,7,3,2,4,5,4,3,4,5,6,7,6,5,4,5] ];
+var reels_0 = [ [7,5,3,2,0,1,3,0,2,4,5,6,7,0,4,1,0,2,3,1,8,2,4,1,0,3,2,1,0,4,6,5,1],
+                [1,4,5,1,6,5,0,2,1,0,3,4,0,2,3,7,6,1,4,0,3,1,2,6,7,2,1,0,4,1,0,0,3],
+                [6,1,7,5,3,0,4,1,6,5,0,1,2,0,3,2,1,3,8,2,9,8,4,0,1,3,0,2,1,4,2,5,7],
+                [0,3,2,4,1,0,3,2,0,4,3,0,1,0,2,3,0,7,6,5,1,6,5,7,2,1,0,4,1,0,0,2,1],
+                [0,8,4,0,1,8,0,2,0,1,3,0,4,2,0,1,3,2,6,7,5,1,7,5,6,1,0,3,1,0,4,2,0] ];
 
 
 Game.prototype.onAssetsLoaded = function(obj){
     
     // Shuffle fake reels    
-    for(var i=0;i<reels_0.length;++i){
-        reels_0[i] = shuffleArray(reels_0[i]);
-    }
+    // for(var i=0;i<reels_0.length;++i){
+        // reels_0[i] = shuffleArray(reels_0[i]);
+    // }
 
 
     /*
      * Create a background which shoudl be in a lower layer
      */
-    this.bg = new GameBackground("im/bg.jpg");
+    this.bg = new GameBackground(["im/bg.jpg","im/bg2.jpg"]);
     
     /*
      * This should be a gameScreen which has a reelset OR
@@ -38,6 +40,9 @@ Game.prototype.onAssetsLoaded = function(obj){
      * everything resizes and scales together in proportion. 
      */
     this.reelset = new Reelset(reels_0);
+    
+    this.winCalculator = new WinCalculator();
+    this.winSplash = new WinSplash();
     
     /*
      * This should be a whole console component in an upper layer. 
@@ -50,8 +55,31 @@ Game.prototype.onAssetsLoaded = function(obj){
     Events.Dispatcher.addEventListener("SPIN",this.onSpinReels);
     Events.Dispatcher.addEventListener("STOP",this.onStopReels);
     
+    this.onReelsSpinning = this.onReelsSpinning.bind(this);
+    Events.Dispatcher.addEventListener("ALL_REELS_SPINNING",this.onReelsSpinning);
+
+    this.onReelsStopped = this.onReelsStopped.bind(this);
+    Events.Dispatcher.addEventListener("ALL_REELS_STOPPED",this.onReelsStopped);
+
     //this.addExplosion()
 }
+
+Game.prototype.onReelsSpinning = function(){
+        Events.Dispatcher.dispatchEvent(new Event("STOP"));
+}
+
+Game.prototype.onReelsStopped = function(){
+    var wins = this.winCalculator.calculate(this.reelset.getReelMap());
+    this.winSplash.show(wins);
+    
+    Events.Dispatcher.addEventListener("WIN_SPLASH_COMPLETE",this.onWinSplashComplete);    
+}
+
+Game.prototype.onWinSplashComplete = function(){
+    console.log("Wins complete");   
+    this.spinButton.setState(SpinButton.IDLE);
+}
+
 
 Game.prototype.onSpinReels = function(){
     console.log("call spin");
@@ -60,14 +88,14 @@ Game.prototype.onSpinReels = function(){
     
 }
 Game.prototype.onStopReels = function(){
-    console.log("call stop");
     var rands = [];
     for(var r=0; r<5; ++r){
         rand = Math.floor(Math.random() * reels_0[r].length);
         rands.push(rand);
     }
-    
-    this.reelset.stopReels([0,250,500,750,1000],rands);
+    console.log("call stop pos " + rands);
+    rands = [8,31,26,4,6];
+    this.reelset.stopReels([0,200,400,600,800],rands);
 }
 
 
