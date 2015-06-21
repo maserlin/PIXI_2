@@ -19,7 +19,7 @@ function Reelset(reels){
 
     this.container.pivot.x = this.container.width/2;
     this.container.pivot.y = this.container.height/2;
-    console.log(this.container)
+    //console.log(this.container)
     this.container.position.x = getWindowBounds().x/2;
     this.container.position.y = getWindowBounds().y/2;
 
@@ -80,8 +80,17 @@ Reelset.prototype.onReelStopped = function(event){
     if(event.data == 4)
     {
         this.ticker.stop();
+        
+        this.reelMap = [];
+        for(var reel in this.reels){
+            this.reelMap.push(this.reels[reel].symbolsInView());
+        }        
         Events.Dispatcher.dispatchEvent(new Event("ALL_REELS_STOPPED"));
     }
+}
+
+Reelset.prototype.getReelMap = function(){
+    return this.reelMap;
 }
 
 Reelset.prototype.spinReels = function(timing){
@@ -91,7 +100,7 @@ Reelset.prototype.spinReels = function(timing){
     var next = 0;
     for(var t in timing){
        setTimeout(function(){
-           console.log(next)
+           //console.log(next)
            that.reels[next].spin();
            ++next 
        },timing[t]);      
@@ -103,7 +112,7 @@ Reelset.prototype.stopReels = function(timing, positions){
     var next = 0;
     for(var t in timing){
        setTimeout(function(){
-           console.log(next)
+           //console.log(next)
            that.reels[next].stop(positions[next]);
            ++next 
        },timing[t]);      

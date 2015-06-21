@@ -1,6 +1,15 @@
-function GameBackground(imageUrl){
-    PIXI.Sprite.call(this,PIXI.Texture.fromImage("im/bg.jpg"));
+function GameBackground(imageUrls){
     
+    
+    
+    this.mainBg = PIXI.Texture.fromImage(imageUrls[0]);
+    
+    PIXI.Sprite.call(this, this.mainBg);
+    
+    // this.altBg = PIXI.Texture.fromImage(imageUrls[1]);
+    // PIXI.Sprite.call(this, this.altBg);
+    // this.texture = this.altBg;
+        
     this.anchor.x = this.anchor.y = 0.5;
 
     // Initial positioning

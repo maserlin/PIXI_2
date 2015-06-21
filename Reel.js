@@ -52,11 +52,11 @@ Reel.prototype.state = Reel.IDLE;
  * SPIN called externally to start reel 
  */
 Reel.prototype.spin = function(){
-    console.log("Reel " + this.id + " spin.")
+    //console.log("Reel " + this.id + " spin.")
     this.cueStop = false;
     this.blur = false;
     if(this.state == Reel.IDLE){
-        console.log("STARTING");
+        //console.log("STARTING");
         this.setSymbols = 0;
         this.state = Reel.STARTING;
     }
@@ -66,7 +66,7 @@ Reel.prototype.spin = function(){
  * STOP called externally to stop reel at stopPos 
  */
 Reel.prototype.stop = function(stopPos, newReelband){
-    console.log("Reel " + this.id + " stop at " + stopPos);
+    //console.log("Reel " + this.id + " stop at " + stopPos);
     this.stopPos = stopPos;
     this.newReelband = newReelband || this.reelband;
     
@@ -127,7 +127,7 @@ Reel.prototype.bounceReel = function(){
             this.symbols[s].position.y = s * 140;
         }
         this.state = Reel.IDLE;
-        console.log("IDLE " + this.symbolsInView())
+        //console.log("IDLE " + this.symbolsInView())
         Events.Dispatcher.dispatchEvent(new Event("REEL_STOPPED", this.id));
     }
 }
@@ -207,7 +207,7 @@ Reel.prototype.stopReel = function(){
         }
 
         this.state = Reel.BOUNCING;
-        console.log("STOP " + this.symbolsInView())
+        //console.log("STOP " + this.symbolsInView())
     }
     
 }

@@ -1,0 +1,122 @@
+function WinSplash(winObj){
+
+    this.container = new PIXI.Container();
+    this.bg = new PIXI.Sprite(PIXI.Texture.fromImage("im/bonus_outro.png"));
+    this.bg.anchor.x = this.bg.anchor.y = 0.5;
+    this.container.addChild(this.bg);
+    this.text;
+    
+    this.show = this.show.bind(this);
+    this.showNextWin = this.showNextWin.bind(this);
+    this.hide = this.hide.bind(this);
+    
+    this.winShown = 0;
+    this.animate = this.animate.bind(this);
+    
+    //
+    this.ticker = PIXI.ticker.shared;
+    this.ticker.autoStart = false;
+    this.ticker.stop();
+    
+    this.active = false;
+    this.animateIn = true;
+
+    var that = this;
+    this.ticker.add(function (time) {
+        that.animate();
+    });
+
+    this.container.alpha = 0.9;
+    this.container.scaleX = 1;
+    this.container.visible = false;
+    this.container.resize = this.resize;
+    stage.addChild(this.container);
+}
+
+
+/**
+ * "this" == this.container 
+ */
+WinSplash.prototype.resize = function(data){
+    this.scale.x = this.scale.y = data.scale.x;
+    this.scaleX = data.scale.x;
+};
+
+
+WinSplash.prototype.show = function(winObj){
+    this.winObj = winObj;
+    this.winShown = 0;
+
+    this.showNextWin();
+}
+
+
+WinSplash.prototype.animate = function(){
+    if(!this.active)return;
+    
+    if(this.animateIn)
+    {
+        if(this.container.scale.x < this.container.scaleX)this.container.scale.x += 0.1;
+        if(this.container.scale.y < this.container.scaleX)this.container.scale.y += 0.1;
+    
+        if(this.container.scale.x >= this.container.scaleX)
+        {
+            this.container.scale.x = this.container.scale.y = this.container.scaleX;
+            this.animateIn = false;
+            this.ticker.stop();
+            setTimeout(this.hide, 1500);
+        }
+    }
+    else
+    {
+        if(this.container.scale.x > 0)this.container.scale.x -= 0.1;
+        if(this.container.scale.y > 0)this.container.scale.y -= 0.1;
+        if(this.container.scale.x <= 0)
+        {
+            this.container.scale.x = this.container.scale.y = 0;
+            this.animateIn = true;
+            this.ticker.stop();
+            this.container.removeChild(this.text);
+            this.container.visible = false;
+            setTimeout(this.showNextWin, 500);
+        }
+    }
+}
+
+WinSplash.prototype.showNextWin = function(){
+    
+    if(this.winShown < this.winObj.lines.length)
+    {
+        var size = getWindowBounds();
+        this.container.position.x = size.x/2;
+        this.container.position.y = size.y/2;
+    
+        var msg = "GBP " + this.winObj.winAmount[this.winShown] + " on line " + (this.winObj.lines[this.winShown]+1);
+        this.text = new PIXI.Text(msg,{font : '48px Arial', fill : 0xff1010, align : 'center'});    
+        this.text.anchor.x = 0.5; 
+        this.text.anchor.y = 0.5;
+        this.text.position.x = this.bg.position.x;
+        this.text.position.y = 50;
+        this.container.addChild(this.text);
+        this.container.visible = true;
+        this.container.scale.x = this.container.scale.y = 0;
+
+        this.active = true;
+        this.ticker.start();
+
+        ++this.winShown;
+    }
+    else
+    {
+        this.active = false;
+        Events.Dispatcher.dispatchEvent(new Event("WIN_SPLASH_COMPLETE"));  
+    }
+    
+}
+
+/**
+ * 
+ */
+WinSplash.prototype.hide = function(){
+        this.ticker.start();
+}
