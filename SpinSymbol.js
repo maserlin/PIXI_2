@@ -31,6 +31,11 @@ SpinSymbol.prototype = Object.create(PIXI.extras.MovieClip.prototype);
 SpinSymbol.prototype.constructor = SpinSymbol;
 SpinSymbol.prototype.blur = false;
 
+/**
+ * COULD use ".texture = nnn" and not use movie clip 
+ * @param {Object} id
+ * @param {Object} blur
+ */
 SpinSymbol.prototype.setId = function(id, blur){
     blur = blur || false;
     
