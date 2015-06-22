@@ -6,6 +6,9 @@ function Game(){
     this.reelset = null;
 
     this.onWinSplashComplete = this.onWinSplashComplete.bind(this);
+    this.dataParser = new DataParser();
+    var server = "http:\\localhost:8000\test";
+    this.serverProxy = new ServerProxy(server, this.dataParser);
 }
   
 /**
@@ -62,31 +65,38 @@ Game.prototype.onAssetsLoaded = function(obj){
     Events.Dispatcher.addEventListener("ALL_REELS_STOPPED",this.onReelsStopped);
 
     //this.addExplosion()
-}
+};
 
 Game.prototype.onReelsSpinning = function(){
         Events.Dispatcher.dispatchEvent(new Event("STOP"));
-}
+};
 
 Game.prototype.onReelsStopped = function(){
     var wins = this.winCalculator.calculate(this.reelset.getReelMap());
     this.winSplash.show(wins);
     
     Events.Dispatcher.addEventListener("WIN_SPLASH_COMPLETE",this.onWinSplashComplete);    
-}
+};
 
 Game.prototype.onWinSplashComplete = function(){
     console.log("Wins complete");   
     this.spinButton.setState(SpinButton.IDLE);
-}
+};
 
 
 Game.prototype.onSpinReels = function(){
     console.log("call spin");
     
+    var req = Object.create(null);
+    req.code = "BET";
+    req.stake = 200;
+    req.winlines = 20;
+    this.serverProxy.makeRequest(req);
+    
     this.reelset.spinReels([0,200,400,600,800]);
     
-}
+};
+
 Game.prototype.onStopReels = function(){
     var rands = [];
     for(var r=0; r<5; ++r){
@@ -94,9 +104,9 @@ Game.prototype.onStopReels = function(){
         rands.push(rand);
     }
     console.log("call stop pos " + rands);
-    rands = [8,31,26,4,6];
+    //rands = [8,31,26,4,6];
     this.reelset.stopReels([0,200,400,600,800],rands);
-}
+};
 
 
 
@@ -128,7 +138,7 @@ Game.prototype.createGameAssets = function(){
     loader.add(assets);
     loader.once('complete',this.onAssetsLoaded);
     loader.load();
-}
+};
 
 
 /** ****************************************************************************************************
@@ -143,7 +153,7 @@ Game.prototype.createBunny = function(){
     this.bunny.anchor.x = 0.5;
     this.bunny.anchor.y = 0.5;
     stage.addChild(this.bunny);
-}
+};
 
 
 /** ****************************************************************************************************
@@ -163,7 +173,7 @@ Game.prototype.addRectangle = function(x,y,w,h){
     stage.addChild(gfx);
     
     this.rect = gfx;
-}
+};
 
 
 /** ****************************************************************************************************
@@ -182,6 +192,6 @@ Game.prototype.addExplosion = function(){
 //    explosion.rotation = Math.random() * Math.PI;
     explosion.gotoAndPlay(0);
     stage.addChild(explosion);
-}
+};
 
 
