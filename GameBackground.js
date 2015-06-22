@@ -13,7 +13,7 @@ function GameBackground(imageUrls){
     this.anchor.x = this.anchor.y = 0.5;
 
     // Initial positioning
-    var size = getWindowBounds()
+    var size = getWindowBounds();
     this.position.x = size.x/2;
     this.position.y = size.y/2;
 

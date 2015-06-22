@@ -6,6 +6,10 @@
     function DataParser(){
         this.x2js = new xml2json();
         trace("Created VF DataParser");
+        
+        this.responseIsValid = this.responseIsValid.bind(this);
+        this.cleanObject = this.cleanObject.bind(this);
+        this.parseResponse = this.parseResponse.bind(this);
     }
 
     var ServerResponseModel = Object.create(null);
@@ -87,7 +91,7 @@
         //  
         switch(code)
         {
-            case GameEvent.InitRequest:
+            case "INIT"://GameEvent.InitRequest:
             {
                 /*
                  * Sets the GameConfiguration up with the server data:
@@ -100,7 +104,7 @@
             }
             break;
     
-            case GameEvent.BetRequest:
+            case "BET"://GameEvent.BetRequest:
             {
                 // Test with a single freespin which hits maxWin
                 //responseXml = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><PlaceBetResponse gameId="39"><Jackpots/><Balances><Balance amount="2190.40" category="TOTAL" currency="GBP" name="Total"/><Balance amount="2190.40" category="CASH" currency="GBP" name="Cash"/></Balances><Outcome balance="2190.40"><Spin layout="2" maxWin="false" position="2,4,25,2,0" spinWin="2.50" stake="2.00" symbols="0,12,3,2,12,0,11,0,1,11,1,3,10,11,9" totalWin="2.50"><Winlines><Winline count="3" id="0" symbol="0" symbols="12,12,0,1,11" win="5"/><Winline count="3" id="10" symbol="0" symbols="12,0,0,3,11" win="5"/><Winline count="4" id="14" symbol="1" symbols="12,12,1,1,11" win="10"/><Winline count="3" id="15" symbol="0" symbols="0,12,0,1,10" win="5"/></Winlines><Bonus id="0" indices="1,4" multiplier="0" position="12" win="0.00"/><Freespins award="7" index="0" multiplier="4" value="6,9,13"/></Spin><Freespin award="7" freespinsWin="7.50" index="7" indices="1,6,13" layout="14" maxWin="true" multiplier="4" position="36,18,16,11,28" spinWin="7.50" stake="2.00" symbols="3,12,6,6,1,0,12,2,0,0,1,4,1,12,2" totalWin="10.00"><Winlines><Winline count="3" id="7" symbol="6" symbols="12,6,12,0,12" win="40"/><Winline count="3" id="8" symbol="0" symbols="12,0,0,4,12" win="5"/><Winline count="5" id="13" symbol="1" symbols="12,1,12,1,12" win="30"/></Winlines></Freespin><Error msg="Invalid request"/><Error msg="Invalid request"/><Error msg="Invalid request"/><Error msg="Invalid request"/><Error msg="Invalid request"/><Error msg="Invalid request"/><DrawState drawId="0" state="closed"><Bet payout="10.00" pick="" seq="0" stake="2.00" type="L" won="true"/></DrawState></Outcome></PlaceBetResponse>'
@@ -174,6 +178,24 @@
      * Turn the server response into some JSON we can work with.
      * It will be further transformed into a platfor-independent format
      * in _createResultsResponse
+     * "<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+        <PlaceBetResponse gameId="1">
+            <Jackpots/>
+            <Balances>
+                <Balance amount="398.70" category="TOTAL" currency="GBP" name="Total"/>
+                <Balance amount="398.70" category="CASH" currency="GBP" name="Cash"/>
+            </Balances>
+            <Outcome balance="398.70">
+                <Spin layout="0" maxWin="false" position="2,7,12,5,29" spinWin="0.70" stake="2.00" symbols="6,2,0,2,1,11,9,6,0,1,2,7,11,2,3">
+                    <Winlines>
+                        <Winline count="3" id="7" symbol="2" symbols="2,2,9,1,2" win="7"/>
+                    </Winlines>
+                </Spin>
+                <DrawState drawId="0" state="betting">
+                    <Bet pick="" seq="0" stake="2.00" type="L" won="pending"/>
+                </DrawState>
+            </Outcome>
+        </PlaceBetResponse>"
      */
     DataParser.prototype._parseResultXml = function(responseXml)
     {
@@ -441,7 +463,7 @@
                               '" winlines="' + jsonData.winlines; 
             strSpinRequest += '" />';
     
-            strSpinRequest += '</PlaceBetRequest>';
+            //strSpinRequest += '</PlaceBetRequest>';
         }
     
         //

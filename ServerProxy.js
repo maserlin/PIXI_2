@@ -4,6 +4,9 @@
         this._dataParser = dataParser;
         this.server = server;
         this.objComms = new Comm();
+        
+        this.receiveResponse = this.receiveResponse.bind(this);
+        
         trace("Created ServerProxy");
     }
     
@@ -66,12 +69,12 @@
             
             /*
              * Balance request does not interfere with the 3 second timing. 
-             */
+             
             case GameEvent.BalanceUpdateRequest:
                 this._requestData = this._dataParser.buildBalanceUpdateRequest();
                 //this._sendBalanceRequest();
                 break;
-
+            */
         }
         
     };
@@ -83,6 +86,7 @@
     {   
         //trace("Sending request after",((new Date().getTime() - this._timeOfLastBet)/1000),"seconds")
        // var server = wrapper.getGameEndpointUrl();
+       console.log(this.server);
         this.objComms.doPost(this.server, this._requestData, this.receiveResponse);
               
         // Get new time of last bet.

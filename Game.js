@@ -7,7 +7,7 @@ function Game(){
 
     this.onWinSplashComplete = this.onWinSplashComplete.bind(this);
     this.dataParser = new DataParser();
-    var server = "http:\\localhost:8000\test";
+    var server = "http:\\\\10.32.10.24:8090\\PIXI";
     this.serverProxy = new ServerProxy(server, this.dataParser);
 }
   

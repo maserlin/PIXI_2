@@ -212,7 +212,6 @@ function Comm(vhostIn) {
     };
 
 }
-Comm = newClass(Comm);
 
 Comm.TOTAL_BYTES = 0;
 
