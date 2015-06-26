@@ -159,8 +159,37 @@ Reel.prototype.setReel = function(){
             this.symbols[s].setId(ids[s],this.blur);
         }
         
-        // -- new symbols
+        /*
+         * Set new symbols. each time in set more to the new ones, from the top of the reels
+         * down, so that as the old symbols pass off the bottom of the screen they will have been
+         * replaced by new ones. Eac iteration increases the number of old symbols to replace
+         * by incrementing this.setSymbols;
+         * Then replace that many from the top (symbol[0]) with ones from the new reelband.
+         * Start with the symbol at stopPos-2, then -2 and -1, etc, until all 5 are from the 
+         * new reelband, at which point we can stop the reels, stopPos will be on the center
+         * of the reels on winline 0.
+         */
         ++this.setSymbols;
+
+
+/* not ready yet
+        switch(this.setSymbols){
+            default:
+                for(var s=this.setSymbols-1; s>=0; --s){
+                    if(this.reelId == 0)console.log("Set symbol " + s + " to " + (s-2))
+                    this.symbols[s].setId(this.newReelband[this.getWrappedIndex(this.stopPos + (s-2))],this.blur);
+                }
+                break;
+            case 5:
+                for(var s=this.setSymbols-1; s>=0; --s){
+                    this.symbols[s].setId(this.newReelband[this.getWrappedIndex(this.stopPos + (s-2))],this.blur);
+                }
+                this.state = Reel.STOPPING;
+                break;
+        }
+return        
+*/
+
         switch(this.setSymbols){
             case 1:
             this.symbols[0].setId(this.newReelband[this.getWrappedIndex(this.stopPos-2)],this.blur);
