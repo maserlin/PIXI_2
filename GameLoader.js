@@ -4,8 +4,26 @@ function GameLoader(){
 
 GameLoader.prototype = Object.create(PIXI.loaders.Loader.prototype);
 GameLoader.prototype.constructor = GameLoader;
-
+var oReq;
 GameLoader.prototype.loadAssets = function(callbackOnDone){
+
+
+    oReq = getXMLHttpRequest();
+    if (oReq != null) {
+        oReq.open("GET", "HolyGrail.xml", true);
+        oReq.onreadystatechange = handler;
+        oReq.send();
+    }
+    else {
+        window.console.log("AJAX (XMLHTTP) not supported.");
+    }
+
+    // var xmlDoc = loadXMLDoc("HolyGrail.xml");
+    // var converter = new xml2json();
+    // console.log(xmlDoc);
+    //var json = converter.xml2json(xmlDoc);
+    //console.log(JSON.stringify(json));
+
     this.callback = callbackOnDone || this.callback;
     var assets = ["im/icon05.json","im/explosion.json","im/BlursNStills.json"];
     assets.push("im/bunny.png");
@@ -16,6 +34,42 @@ GameLoader.prototype.loadAssets = function(callbackOnDone){
     this.load();
 }
 
+function handler()
+{
+    if (oReq.readyState == 4 /* complete */) {
+        if (oReq.status == 200) {
+            console.log(oReq.responseText);
+        }
+    }
+}
+function getXMLHttpRequest() 
+{
+    if (window.XMLHttpRequest) {
+        return new window.XMLHttpRequest;
+    }
+    else {
+        try {
+            return new ActiveXObject("MSXML2.XMLHTTP.3.0");
+        }
+        catch(ex) {
+            return null;
+        }
+    }
+}
+function loadXMLDoc(filename)
+{
+    if (window.XMLHttpRequest)
+    {
+        xhttp=new XMLHttpRequest();
+    }
+    else // code for IE5 and IE6
+    {
+        xhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xhttp.open("GET",filename,false);
+    xhttp.send();
+    return xhttp.responseXML;
+}
 
 GameLoader.prototype.onProgress = function(data){
     console.log(data.progress);

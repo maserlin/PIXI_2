@@ -5,7 +5,7 @@
     
     function DataParser(){
         this.x2js = new xml2json();
-        trace("Created VF DataParser");
+        console.log("Created VF DataParser");
         
         this.responseIsValid = this.responseIsValid.bind(this);
         this.cleanObject = this.cleanObject.bind(this);
@@ -126,7 +126,7 @@
                 }
                 catch(e)
                 {
-                    trace("Error creating game results from " + responseXml);
+                    console.log("Error creating game results from " + responseXml);
                 }
             }
             break;
@@ -160,7 +160,7 @@
      */
     DataParser.prototype._parseInitXml = function (responseXml)
     {
-        var xmlDoc = this._createDoc(responseXml);
+        var xmlDoc = createDoc(responseXml);
         this.cleanObject(this.serverResponseAsJSON);
         this.serverResponseAsJSON = this.x2js.xml2json(xmlDoc);
 
@@ -199,9 +199,9 @@
      */
     DataParser.prototype._parseResultXml = function(responseXml)
     {
-        //trace(responseXml);
+        //console.log(responseXml);
     
-        var xmlDoc = this._createDoc(responseXml);
+        var xmlDoc = createDoc(responseXml);
         this.cleanObject(this.serverResponseAsJSON);
         this.serverResponseAsJSON = this.x2js.xml2json(xmlDoc);
         
@@ -477,26 +477,4 @@
         return "<CustomerBalanceRequest />";
     };
 
-
-
-/**
- *  @return a valid DOM document 
- */
-    DataParser.prototype._createDoc = function(xmlData)
-    {
-        var xmlDoc; 
-        // Parse server XML
-        if (window.DOMParser)
-        {
-            parser=new DOMParser();
-            xmlDoc=parser.parseFromString(xmlData, "text/xml");
-        }
-        else // Internet Explorer
-        {
-            xmlDoc=new ActiveXObject("Microsoft.XMLDOM");
-            xmlDoc.async=false;
-            xmlDoc.loadXML(xmlData);
-        } 
-        return xmlDoc;
-    };;
     

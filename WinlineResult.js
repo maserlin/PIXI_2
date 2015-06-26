@@ -7,7 +7,6 @@
         this.flWin = parseFloat(jsonData._win);
         this.arrSymbols = jsonData._symbols.split(",");
     }
-    WinlineResult = newClass(WinlineResult);
 
     WinlineResult.prototype.intId;
     WinlineResult.prototype.intSymbolId;

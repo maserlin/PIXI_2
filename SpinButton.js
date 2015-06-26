@@ -53,8 +53,8 @@ SpinButton.prototype.onAllReelsSpinning = function(){
  * but only once on iPad or desktop or other Androids. 
  */
 SpinButton.prototype.buttonClick = function(){
-    if(!this.clicked){
         this.spinButton.gotoAndPlay(0);
+    if(!this.clicked){
         this.clicked = true;
         this.performStateAction();
     }

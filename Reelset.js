@@ -52,20 +52,13 @@ function Reelset(reels){
     this.onReelSpinning = this.onReelSpinning.bind(this);
     Events.Dispatcher.addEventListener("REEL_SPINNING",this.onReelSpinning);
     
-    // Reel animation loop
-    this.ticker = PIXI.ticker.shared;
-    // Set this to prevent starting this ticker when listeners are added.
-    // By default this is true only for the PIXI.ticker.shared instance.
-    this.ticker.autoStart = false;
-    // FYI, call this to ensure the ticker is stopped. It should be stopped
-    // if you have not attempted to render anything yet.
-    this.ticker.stop();
-    // Call this when you are ready for a running shared ticker.
-    // this.ticker.start();
-    var that = this;
-    this.ticker.add(function (time) {
-            for(var reel in that.reels)that.reels[reel].animate(time);
-    });
+    // Add our reels to the global animation loop.
+    this.animateReels = this.animateReels.bind(this);
+}
+
+
+Reelset.prototype.animateReels = function(){
+    for(var reel in this.reels)this.reels[reel].animate();
 }
 
 
@@ -79,7 +72,7 @@ Reelset.prototype.onReelSpinning = function(event){
 Reelset.prototype.onReelStopped = function(event){
     if(event.data == 4)
     {
-        this.ticker.stop();
+        globalTicker.remove(this.animateReels);
         
         this.reelMap = [];
         for(var reel in this.reels){
@@ -94,10 +87,11 @@ Reelset.prototype.getReelMap = function(){
 }
 
 Reelset.prototype.spinReels = function(timing){
-    this.ticker.start();
-    
-    var that = this;
+
+    globalTicker.add(this.animateReels);
+
     var next = 0;
+    var that = this;
     for(var t in timing){
        setTimeout(function(){
            //console.log(next)

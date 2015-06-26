@@ -3,20 +3,34 @@
  * TODO show a splash screen with progress
  */
 var game = null;
+
+/**
+ * trace to console.log: easy to turn all off
+ * use trace instead of console.log in game code
+ */
+var trace = console.log.bind(console);
+
+/*
+ * Approx size of a game background; 
+ * overwritten when the real background loads.
+ */
 var gameWidth = 1136;
 var gameHeight = 640;
 
-/** Create a new instance of a pixi stage 
+/** Create a new instance of a pixi stage
+  * stage = new Stage(0x000000,true);  
   * (Deprecated in V3: just delare a Container and bung everything in it)
   * TODO also make one for a console?
   */
-var stage = new PIXI.Container();//Stage(0x000000,true);
+var stage = new PIXI.Container();
 
-// create a renderer instance.
+// Get the current size of the window
 var size = getWindowBounds();
+
+// Create a renderer instance to fit window.
 var renderer = PIXI.autoDetectRenderer(size.x, size.y);
 
-// add the renderer view element to the DOM
+// Add the renderer view element to the DOM
 document.body.appendChild(renderer.view);
 
 /**
@@ -34,6 +48,14 @@ document.addEventListener("DOMContentLoaded", function init(){
   requestAnimationFrame( animate );
 
 });
+
+/**
+ * Global animation ticker: starts by default when a movie clip
+ * e.g. our spin button is declared.
+ * We can attach and remove bound functions to it at will
+ * to put ourselves "in the loop" for animating reels, winlines, win splashes etc. 
+ */
+var globalTicker = PIXI.ticker.shared;
 
 /**
  * Create a new Game, tell it the assets have loaded.
@@ -55,14 +77,7 @@ function onAssetsLoaded(){
  * Main render loop
  */ 
 function animate() {
- 
     requestAnimationFrame( animate );
-
-    // just for fun, lets rotate mr rabbit a little
-    //game.bunny.rotation += 0.1;
-    //game.rect.rotation += -0.1;
-    
-    // render the stage   
     renderer.render(stage);
 };
 
@@ -71,14 +86,22 @@ function animate() {
  */ 
 function onWindowResize(Event){
     var size = getWindowBounds();
+
+    // Resize the renderer
     renderer.resize(size.x,size.y);
     
+    // Calculate scale based on background dimensions (gameWidth, gameHeight)
     var scale = new Point(size.x / gameWidth, size.y / gameHeight)
 
-    // Temp: center everything on the stage!
+    // Call resize on any object that has a resize method.
+/*
+    for(child in stage.children){
+        if(stage.children[child].resize)stage.children[child].resize({size:size,scale:scale});
+    }  
+*/
     for(var child=0; child<stage.children.length; ++child){
-       if(stage.children[child].resize)stage.children[child].resize({size:size,scale:scale});
-    } 
+        if(stage.children[child].resize)stage.children[child].resize({size:size,scale:scale});
+    }
 };
 
 /**
@@ -125,4 +148,26 @@ function shuffleArray(array) {
     }
     
     return array;
+};
+
+/**
+ *  UTILS: return a valid DOM document 
+ */
+function createDoc(xmlData)
+{
+    var xmlDoc; 
+ 
+    // Parse server XML
+    if (window.DOMParser)
+    {
+        parser=new DOMParser();
+        xmlDoc=parser.parseFromString(xmlData, "text/xml");
+    }
+    else // Internet Explorer
+    {
+        xmlDoc=new ActiveXObject("Microsoft.XMLDOM");
+        xmlDoc.async=false;
+        xmlDoc.loadXML(xmlData);
+    } 
+    return xmlDoc;
 };

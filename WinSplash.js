@@ -7,25 +7,15 @@ function WinSplash(winObj){
     this.text;
     
     this.show = this.show.bind(this);
+    this.animate = this.animate.bind(this);
     this.showNextWin = this.showNextWin.bind(this);
     this.hide = this.hide.bind(this);
     
     this.winShown = 0;
     this.animate = this.animate.bind(this);
     
-    //
-    this.ticker = PIXI.ticker.shared;
-    this.ticker.autoStart = false;
-    this.ticker.stop();
-    
-    this.active = false;
     this.animateIn = true;
-
-    var that = this;
-    this.ticker.add(function (time) {
-        that.animate();
-    });
-
+    
     this.container.alpha = 0.9;
     this.container.scaleX = 1;
     this.container.visible = false;
@@ -52,7 +42,6 @@ WinSplash.prototype.show = function(winObj){
 
 
 WinSplash.prototype.animate = function(){
-    if(!this.active)return;
     
     if(this.animateIn)
     {
@@ -61,9 +50,9 @@ WinSplash.prototype.animate = function(){
     
         if(this.container.scale.x >= this.container.scaleX)
         {
+            globalTicker.remove(this.animate);
+          
             this.container.scale.x = this.container.scale.y = this.container.scaleX;
-            this.animateIn = false;
-            this.ticker.stop();
             setTimeout(this.hide, 1500);
         }
     }
@@ -71,11 +60,12 @@ WinSplash.prototype.animate = function(){
     {
         if(this.container.scale.x > 0)this.container.scale.x -= 0.1;
         if(this.container.scale.y > 0)this.container.scale.y -= 0.1;
+        
         if(this.container.scale.x <= 0)
         {
+            globalTicker.remove(this.animate);
+
             this.container.scale.x = this.container.scale.y = 0;
-            this.animateIn = true;
-            this.ticker.stop();
             this.container.removeChild(this.text);
             this.container.visible = false;
             setTimeout(this.showNextWin, 500);
@@ -101,14 +91,15 @@ WinSplash.prototype.showNextWin = function(){
         this.container.visible = true;
         this.container.scale.x = this.container.scale.y = 0;
 
-        this.active = true;
-        this.ticker.start();
+        this.animateIn = true;
+
+        // Add self to animation timer
+        globalTicker.add(this.animate);
 
         ++this.winShown;
     }
     else
     {
-        this.active = false;
         Events.Dispatcher.dispatchEvent(new Event("WIN_SPLASH_COMPLETE"));  
     }
     
@@ -118,5 +109,6 @@ WinSplash.prototype.showNextWin = function(){
  * 
  */
 WinSplash.prototype.hide = function(){
-        this.ticker.start();
+    this.animateIn = false;
+    globalTicker.add(this.animate);
 }

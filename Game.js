@@ -10,6 +10,7 @@ function Game(){
     var server = "http:\\\\10.32.10.24:8090\\PIXI";
     this.serverProxy = new ServerProxy(server, this.dataParser);
 }
+
   
 /**
  * TODO proper config  
@@ -86,6 +87,7 @@ Game.prototype.onWinSplashComplete = function(){
 
 Game.prototype.onSpinReels = function(){
     console.log("call spin");
+    
     
     var req = Object.create(null);
     req.code = "BET";
