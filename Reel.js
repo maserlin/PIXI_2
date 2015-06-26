@@ -35,6 +35,7 @@ function Reel(reel, reelband){
     }
     this.frameTop = this.symbols[1].position.y;
     
+    this.animate = this.animate.bind(this);
 }
 
 Reel.prototype = Object.create(PIXI.Container.prototype);
@@ -53,13 +54,15 @@ Reel.prototype.state = Reel.IDLE;
  */
 Reel.prototype.spin = function(){
     //console.log("Reel " + this.id + " spin.")
-    this.cueStop = false;
-    this.blur = false;
     if(this.state == Reel.IDLE){
         //console.log("STARTING");
+        this.cueStop = false;
+        this.blur = false;
         this.setSymbols = 0;
         this.state = Reel.STARTING;
+        globalTicker.add(this.animate);
     }
+
 }
 
 /**
@@ -129,6 +132,8 @@ Reel.prototype.bounceReel = function(){
         this.state = Reel.IDLE;
         //console.log("IDLE " + this.symbolsInView())
         Events.Dispatcher.dispatchEvent(new Event("REEL_STOPPED", this.id));
+        
+        globalTicker.remove(this.animate);
     }
 }
 

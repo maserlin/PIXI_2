@@ -19,7 +19,6 @@ function Reelset(reels){
 
     this.container.pivot.x = this.container.width/2;
     this.container.pivot.y = this.container.height/2;
-    //console.log(this.container)
     this.container.position.x = getWindowBounds().x/2;
     this.container.position.y = getWindowBounds().y/2;
 
@@ -51,14 +50,6 @@ function Reelset(reels){
     Events.Dispatcher.addEventListener("REEL_STOPPED",this.onReelStopped);
     this.onReelSpinning = this.onReelSpinning.bind(this);
     Events.Dispatcher.addEventListener("REEL_SPINNING",this.onReelSpinning);
-    
-    // Add our reels to the global animation loop.
-    this.animateReels = this.animateReels.bind(this);
-}
-
-
-Reelset.prototype.animateReels = function(){
-    for(var reel in this.reels)this.reels[reel].animate();
 }
 
 
@@ -72,8 +63,6 @@ Reelset.prototype.onReelSpinning = function(event){
 Reelset.prototype.onReelStopped = function(event){
     if(event.data == 4)
     {
-        globalTicker.remove(this.animateReels);
-        
         this.reelMap = [];
         for(var reel in this.reels){
             this.reelMap.push(this.reels[reel].symbolsInView());
@@ -87,14 +76,10 @@ Reelset.prototype.getReelMap = function(){
 }
 
 Reelset.prototype.spinReels = function(timing){
-
-    globalTicker.add(this.animateReels);
-
     var next = 0;
     var that = this;
     for(var t in timing){
        setTimeout(function(){
-           //console.log(next)
            that.reels[next].spin();
            ++next 
        },timing[t]);      
@@ -106,7 +91,6 @@ Reelset.prototype.stopReels = function(timing, positions){
     var next = 0;
     for(var t in timing){
        setTimeout(function(){
-           //console.log(next)
            that.reels[next].stop(positions[next]);
            ++next 
        },timing[t]);      

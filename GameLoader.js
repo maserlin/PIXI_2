@@ -4,10 +4,17 @@ function GameLoader(){
 
 GameLoader.prototype = Object.create(PIXI.loaders.Loader.prototype);
 GameLoader.prototype.constructor = GameLoader;
+
+// Temp XML loader
 var oReq;
+
 GameLoader.prototype.loadAssets = function(callbackOnDone){
 
-
+    /* 
+     * Rough and ready code to asynchronously load an XML file 
+     * for reading into a configuration: 
+     * Real settings *might* come from server init.
+     */
     oReq = getXMLHttpRequest();
     if (oReq != null) {
         oReq.open("GET", "HolyGrail.xml", true);
@@ -18,11 +25,15 @@ GameLoader.prototype.loadAssets = function(callbackOnDone){
         window.console.log("AJAX (XMLHTTP) not supported.");
     }
 
-    // var xmlDoc = loadXMLDoc("HolyGrail.xml");
-    // var converter = new xml2json();
-    // console.log(xmlDoc);
-    //var json = converter.xml2json(xmlDoc);
-    //console.log(JSON.stringify(json));
+/*
+ * This is a syynchronous loader: interrupts everything while it executes.
+    var xmlDoc = loadXMLDoc("HolyGrail.xml");
+    var converter = new xml2json();
+    console.log(xmlDoc);
+    var json = converter.xml2json(xmlDoc);
+    console.log(JSON.stringify(json));
+*/
+
 
     this.callback = callbackOnDone || this.callback;
     var assets = ["im/icon05.json","im/explosion.json","im/BlursNStills.json"];
@@ -42,6 +53,11 @@ function handler()
         }
     }
 }
+
+/**
+ * Gets a valid request object on any platform (in theory)
+ * TODO test this on devices! 
+ */
 function getXMLHttpRequest() 
 {
     if (window.XMLHttpRequest) {
@@ -56,6 +72,9 @@ function getXMLHttpRequest()
         }
     }
 }
+
+/*
+ * Synchronous loader code...
 function loadXMLDoc(filename)
 {
     if (window.XMLHttpRequest)
@@ -70,6 +89,7 @@ function loadXMLDoc(filename)
     xhttp.send();
     return xhttp.responseXML;
 }
+*/
 
 GameLoader.prototype.onProgress = function(data){
     console.log(data.progress);
